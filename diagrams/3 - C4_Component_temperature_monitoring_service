@@ -1,0 +1,29 @@
+@startuml
+title TemperatureMonitoringService - Component Diagram
+
+skinparam rectangle {
+  BackgroundColor #D3F9D8
+  BorderColor black
+  BorderThickness 1
+  RoundCorner 10
+}
+
+rectangle "Temperature Monitoring Service" as tempMonitorService {
+  rectangle "API" as api
+  rectangle "Data Collector" as dataCollector
+  rectangle "Data Processor" as dataProcessor
+  rectangle "Database Client" as dbClient
+  rectangle "Alert Manager" as alertManager
+}
+
+rectangle "Temperature Database" as temperatureDb #FFE4E1
+rectangle "Heating Module System" as heatingModuleSystem #FFE4E1
+
+api --> dataCollector : настройка мониторинга
+dataCollector --> heatingModuleSystem : получение данных
+dataCollector --> dataProcessor : передача данных
+dataProcessor --> dbClient : сохранение данных
+dataProcessor --> alertManager : анализ и уведомления
+dbClient --> temperatureDb : SQL доступ
+
+@enduml

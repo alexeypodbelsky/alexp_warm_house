@@ -1,0 +1,72 @@
+@startuml
+title Warmhouse Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "Пользователь системы Умный дом")
+System(WarmhouseSystem, "Warmhouse System", "Отопление, освещение, ворота, наблюдение")
+
+Container_Boundary(WarmhouseSystem, "FitLife System") {
+  Container(ApiApp, "API Application (IPI)", "Python, Fast API", "Обрабатывает пользовательские запросы, управление пользователями и устройствами")
+  
+  Container(HeatingControlService, "Heating control service", "Python", "Управление отоплением")
+  Container(TemperatureMonitoringService, "Temperature monitoring service", "Python", "Мониторинг температуры")
+  Container(TemperatureDatabase, "Monitoring database", "PostgreSQL/TimescaleDB", "Хранит данные мониторинга температуры")
+  
+  Container(LightControlService, "Light control service", "Python", "Управление освещением")
+  
+  Container(GateControlService, "Gate control service", "Python", "Управление воротами")
+  Container(GateMonitoringService, "Gate monitoring service", "Python", "Отслеживание состояния ворот")
+  
+  Container(VideoCameraService, "Video and Camera Service", "Python", "Управление видеоархивом, просмотр камер и детекция движения")
+  Container(VideoDatabase, "Video database", "PostgreSQL", "Хранит видео и информацию о движении")
+  
+  Container(UsersDatabase, "Users database", "PostgreSQL", "Хранение данных о пользователях")
+  Container(CommonDeviceService, "Common device service", "Python", "Регистрация/удаление/активация/деактивация устройств. Получение списка устройств для пользователя")
+  Container(DeviceCatalogDatabase, "DeviceCatalog database", "PostgreSQL", "Хранит данные о подключенных устройствах, а также их настройки")
+
+}
+
+System(HeatingModuleSystem, "Heating module", "Модуль управления отоплением")
+System(LightControlModule, "Light control module", "Модуль управления освещением")
+System(GateModule, "Gate module", "Модуль управления воротами")
+System(CameraModule, "Camera module", "Модуль работы с камерами")
+
+Rel(user, ApiApp, "Uses the system")
+
+Rel(ApiApp, HeatingControlService, "Управление отоплением и запрос телеметрии")
+Rel(ApiApp, LightControlService, "Управляет освещением")
+Rel(ApiApp, GateControlService, "Управляет воротами")
+Rel(ApiApp, VideoCameraService, "Управляет и получает данные наблюдения")
+
+Rel(ApiApp, GateMonitoringService, "Следит за состоянием ворот")
+Rel(ApiApp, TemperatureMonitoringService, "Настройка мониторинга и получение данных мониторинга")
+
+Rel(ApiApp, UsersDatabase, "Управление пользователями и хранение данных")
+Rel(ApiApp, CommonDeviceService, "Регистрация и управление устройствами")
+Rel(CommonDeviceService, DeviceCatalogDatabase, "Чтение и запись данных устройств")
+
+Rel(LightControlService, LightControlModule, "Управляет модулем освещения")
+
+Rel(GateControlService, GateModule, "Управляет модулем ворот")
+Rel(GateMonitoringService, GateModule, "Проверяет ворота")
+
+Rel(VideoCameraService, VideoDatabase, "Запись и чтение видео и данных детекции движения")
+Rel(VideoCameraService, CameraModule, "Получение видео с камеры в реальном времени и анализ")
+
+Rel(HeatingControlService, HeatingModuleSystem, "Управляет")
+Rel(TemperatureMonitoringService, TemperatureDatabase, "Сохранение и предоставление данных мониторинга")
+Rel(TemperatureMonitoringService, HeatingModuleSystem, "Получает данные мониторинга")
+
+' Доступ к каталогу устройств для всех сервисов
+Rel(ApiApp, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(HeatingControlService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(LightControlService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(GateControlService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(VideoCameraService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(GateMonitoringService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(TemperatureMonitoringService, CommonDeviceService, "Доступ к каталогу устройств")
+
+@enduml

@@ -1,0 +1,274 @@
+openapi: 3.0.3
+info:
+  title: ApiApp (API Application) API
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      summary: Получить список пользователей
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Создать нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Пользователь создан
+  /users/{userId}:
+    get:
+      summary: Получить пользователя по ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      summary: Обновить данные пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Пользователь обновлён
+    delete:
+      summary: Удалить пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Пользователь удалён
+  /devices/{userId}:
+    get:
+      summary: Получить список устройств
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список устройств
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+    post:
+      summary: Зарегистрировать новое устройство
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '201':
+          description: Устройство зарегистрировано
+  /devices/{userId}/{deviceId}:
+    get:
+      summary: Получить устройство по ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация об устройстве
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+    put:
+      summary: Обновить устройство
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdate'
+      responses:
+        '200':
+          description: Устройство обновлено
+    delete:
+      summary: Удалить устройство
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Устройство удалено
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    UserCreate:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    UserUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+    Device:
+      type: object
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        serial_number:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        group_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        settings:
+          type: object
+          description: "Настройки устройства в формате JSON"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    DeviceCreate:
+      type: object
+      required:
+        - serial_number
+        - name
+        - type
+        - _user_id
+      properties:
+        serial_number:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        group_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        settings:
+          type: object
+    DeviceUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+        group_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        settings:
+          type: object

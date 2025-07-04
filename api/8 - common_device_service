@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: Common Device Service API
+  version: 1.0.0
+paths:
+  /register:
+    post:
+      summary: Регистрация нового устройства
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistration'
+      responses:
+        '201':
+          description: Устройство зарегистрировано
+  /activate/{deviceId}:
+    post:
+      summary: Активация устройства
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Устройство активировано
+  /deactivate/{deviceId}:
+    post:
+      summary: Деактивация устройства
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Устройство деактивировано
+  /list/{userId}:
+    get:
+      summary: Получить список устройств пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список устройств
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceSummary'
+components:
+  schemas:
+    DeviceRegistration:
+      type: object
+      required:
+        - serial_number
+        - name
+        - type
+        - user_id
+      properties:
+        serial_number:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        group_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        settings:
+          type: object
+    DeviceSummary:
+      type: object
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string

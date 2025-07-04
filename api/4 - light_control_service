@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: Light Control Service API
+  version: 1.0.0
+paths:
+  /commands:
+    post:
+      summary: Отправить команду управления освещением
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LightCommand'
+      responses:
+        '200':
+          description: Команда принята
+  /status/{deviceId}:
+    get:
+      summary: Получить состояние устройства освещения
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Состояние устройства
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightStatus'
+components:
+  schemas:
+    LightCommand:
+      type: object
+      required:
+        - device_id
+        - command
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        command:
+          type: string
+          description: 'turn_on, turn_off, set_brightness, set_color'
+        parameters:
+          type: object
+          description: 'Параметры команды'
+    LightStatus:
+      type: object
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        is_on:
+          type: boolean
+        brightness:
+          type: integer
+          description: 'Уровень яркости (0-100)'
+        color:
+          type: string
+          description: 'Цвет освещения'
+        updated_at:
+          type: string
+          format: date-time

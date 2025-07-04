@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: Temperature Monitoring Service API
+  version: 1.0.0
+paths:
+  /records/{deviceId}:
+    get:
+      summary: Получить записи температуры по устройству
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Список записей температуры
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemperatureRecord'
+  /monitoring:
+    post:
+      summary: Настроить мониторинг температуры
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitoringSettings'
+      responses:
+        '200':
+          description: Настройки применены
+components:
+  schemas:
+    TemperatureRecord:
+      type: object
+      properties:
+        record_id:
+          type: string
+          format: uuid
+        device_id:
+          type: string
+          format: uuid
+        temperature:
+          type: number
+          format: float
+        recorded_at:
+          type: string
+          format: date-time
+    MonitoringSettings:
+      type: object
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        interval_seconds:
+          type: integer
+          description: Интервал сбора данных
+        threshold_min:
+          type: number
+          format: float
+          description: Минимальный порог температуры
+        threshold_max:
+          type: number
+          format: float
+          description: Максимальный порог температуры

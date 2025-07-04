@@ -78,8 +78,6 @@
 
 Домен "Управление отоплением" - это существующее решение, которое будет подвергнуто рефакторингу и разделено на микросервисы. Эта подсистема станет первым релизом после рефакторинга, что позволит команде разработчиков быстро получить представление о функционировании микросервисной архитектуры и оперативно внести необходимые изменения в процесс разработки. Станет понятно, как лучше масштабировать эту и другие подсистемы в контексте микросервисной архитектуры и можно будет оперативно скорректировать стратегию. Масштабирование может отличаться от других доменов.
 
-
-
 ### **4. Проблемы монолитного решения**
 
 - Ограниченная масштабируемость, потому что монолит сложно масштабировать по частям. Это значит что существующая система просто не справиться с нагрузкой при увеличении количества подключённых домов.  
@@ -144,18 +142,183 @@ Rel(WarmhouseSystem, VideoSystem, "Управление и получение д
 
 ```
 
-
 # Задание 2. Проектирование микросервисной архитектуры
 
 В этом задании вам нужно предоставить только диаграммы в модели C4. Мы не просим вас отдельно описывать получившиеся микросервисы и то, как вы определили взаимодействия между компонентами To-Be системы. Если вы правильно подготовите диаграммы C4, они и так это покажут.
 
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+```puml
+
+@startuml
+title Warmhouse Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "Пользователь системы Умный дом")
+System(WarmhouseSystem, "Warmhouse System", "Отопление, освещение, ворота, наблюдение")
+
+Container_Boundary(WarmhouseSystem, "FitLife System") {
+  Container(ApiApp, "API Application (IPI)", "Python, Fast API", "Обрабатывает пользовательские запросы, управление пользователями и устройствами")
+  
+  Container(HeatingControlService, "Heating control service", "Python", "Управление отоплением")
+  Container(TemperatureMonitoringService, "Temperature monitoring service", "Python", "Мониторинг температуры")
+  Container(TemperatureDatabase, "Monitoring database", "PostgreSQL/TimescaleDB", "Хранит данные мониторинга температуры")
+  
+  Container(LightControlService, "Light control service", "Python", "Управление освещением")
+  
+  Container(GateControlService, "Gate control service", "Python", "Управление воротами")
+  Container(GateMonitoringService, "Gate monitoring service", "Python", "Отслеживание состояния ворот")
+  
+  Container(VideoCameraService, "Video and Camera Service", "Python", "Управление видеоархивом, просмотр камер и детекция движения")
+  Container(VideoDatabase, "Video database", "PostgreSQL", "Хранит видео и информацию о движении")
+  
+  Container(UsersDatabase, "Users database", "PostgreSQL", "Хранение данных о пользователях")
+  Container(CommonDeviceService, "Common device service", "Python", "Регистрация/удаление/активация/деактивация устройств. Получение списка устройств для пользователя")
+  Container(DeviceCatalogDatabase, "DeviceCatalog database", "PostgreSQL", "Хранит данные о подключенных устройствах, а также их настройки")
+
+}
+
+System(HeatingModuleSystem, "Heating module", "Модуль управления отоплением")
+System(LightControlModule, "Light control module", "Модуль управления освещением")
+System(GateModule, "Gate module", "Модуль управления воротами")
+System(CameraModule, "Camera module", "Модуль работы с камерами")
+
+Rel(user, ApiApp, "Uses the system")
+
+Rel(ApiApp, HeatingControlService, "Управление отоплением и запрос телеметрии")
+Rel(ApiApp, LightControlService, "Управляет освещением")
+Rel(ApiApp, GateControlService, "Управляет воротами")
+Rel(ApiApp, VideoCameraService, "Управляет и получает данные наблюдения")
+
+Rel(ApiApp, GateMonitoringService, "Следит за состоянием ворот")
+Rel(ApiApp, TemperatureMonitoringService, "Настройка мониторинга и получение данных мониторинга")
+
+Rel(ApiApp, UsersDatabase, "Управление пользователями и хранение данных")
+Rel(ApiApp, CommonDeviceService, "Регистрация и управление устройствами")
+Rel(CommonDeviceService, DeviceCatalogDatabase, "Чтение и запись данных устройств")
+
+Rel(LightControlService, LightControlModule, "Управляет модулем освещения")
+
+Rel(GateControlService, GateModule, "Управляет модулем ворот")
+Rel(GateMonitoringService, GateModule, "Проверяет ворота")
+
+Rel(VideoCameraService, VideoDatabase, "Запись и чтение видео и данных детекции движения")
+Rel(VideoCameraService, CameraModule, "Получение видео с камеры в реальном времени и анализ")
+
+Rel(HeatingControlService, HeatingModuleSystem, "Управляет")
+Rel(TemperatureMonitoringService, TemperatureDatabase, "Сохранение и предоставление данных мониторинга")
+Rel(TemperatureMonitoringService, HeatingModuleSystem, "Получает данные мониторинга")
+
+' Доступ к каталогу устройств для всех сервисов
+Rel(ApiApp, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(HeatingControlService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(LightControlService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(GateControlService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(VideoCameraService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(GateMonitoringService, CommonDeviceService, "Доступ к каталогу устройств")
+Rel(TemperatureMonitoringService, CommonDeviceService, "Доступ к каталогу устройств")
+
+@enduml
+
+```
 
 **Диаграмма компонентов (Components)**
 
 Добавьте диаграмму для каждого из выделенных микросервисов.
+
+```puml
+
+@startuml
+title ApiApp - Component Diagram
+
+skinparam rectangle {
+  BackgroundColor #D0E1F9
+  BorderColor black
+  BorderThickness 1
+  RoundCorner 10
+}
+
+rectangle "API Application" as ApiApp {
+  rectangle "FastAPI (REST API)" as fastApi
+  rectangle "User Manager" as userManager
+  rectangle "Device Manager" as deviceManager
+  rectangle "Command Processor" as commandProcessor
+  rectangle "Event Publisher" as eventPublisher
+}
+
+rectangle "Users Database" as usersDb #FFE4E1
+rectangle "Common Device Service API" as commonDeviceApi #FFE4E1
+rectangle "Heating Control Service API" as heatingControlApi #FFE4E1
+rectangle "Light Control Service API" as lightControlApi #FFE4E1
+rectangle "Gate Control Service API" as gateControlApi #FFE4E1
+rectangle "Video & Camera Service API" as videoCameraApi #FFE4E1
+
+fastApi --> userManager 
+fastApi --> deviceManager
+fastApi --> commandProcessor
+
+userManager --> usersDb : SQL доступ
+deviceManager --> commonDeviceApi : REST
+commandProcessor --> heatingControlApi : REST
+commandProcessor --> lightControlApi : REST
+commandProcessor --> gateControlApi : REST
+commandProcessor --> videoCameraApi : REST
+
+@enduml
+
+```
+
+
+```puml
+
+
+
+```
+
+
+```puml
+
+
+
+```
+
+
+```puml
+
+
+
+```
+
+
+```puml
+
+
+
+```
+
+
+```puml
+
+
+
+```
+
+
+```puml
+
+
+
+```
+
+
+```puml
+
+
+
+```
 
 **Диаграмма кода (Code)**
 

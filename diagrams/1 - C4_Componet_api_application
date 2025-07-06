@@ -1,5 +1,5 @@
 @startuml
-title ApiApp - Component Diagram
+title Api application - Component Diagram
 
 skinparam rectangle {
   BackgroundColor #D0E1F9
@@ -13,7 +13,6 @@ rectangle "API Application" as ApiApp {
   rectangle "User Manager" as userManager
   rectangle "Device Manager" as deviceManager
   rectangle "Command Processor" as commandProcessor
-  rectangle "Event Publisher" as eventPublisher
 }
 
 rectangle "Users Database" as usersDb #FFE4E1
@@ -22,6 +21,8 @@ rectangle "Heating Control Service API" as heatingControlApi #FFE4E1
 rectangle "Light Control Service API" as lightControlApi #FFE4E1
 rectangle "Gate Control Service API" as gateControlApi #FFE4E1
 rectangle "Video & Camera Service API" as videoCameraApi #FFE4E1
+rectangle "Temperature monitoring service API" as temperatureMonitoringApi #FFE4E1
+rectangle "Gate monitoring service API" as gateMonitoringApi #FFE4E1
 
 fastApi --> userManager 
 fastApi --> deviceManager
@@ -33,5 +34,7 @@ commandProcessor --> heatingControlApi : REST
 commandProcessor --> lightControlApi : REST
 commandProcessor --> gateControlApi : REST
 commandProcessor --> videoCameraApi : REST
+commandProcessor --> temperatureMonitoringApi : REST
+commandProcessor --> gateMonitoringApi : REST
 
 @enduml

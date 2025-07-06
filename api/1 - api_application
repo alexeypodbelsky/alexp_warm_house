@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: ApiApp (API Application) API
+  title: API Application API
   version: 1.0.0
 paths:
   /users:

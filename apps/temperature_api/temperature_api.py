@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import random
+import datetime
 
 app = Flask(__name__)
 
@@ -42,14 +43,45 @@ def getTemperature():
 
     temperature = generateTemperature()
 
+    # Форматируем текущее время в RFC3339 (ISO8601)
+    timestamp = datetime.datetime.utcnow().isoformat() + "Z"
+
     response = {
         "location": location,
         "sensor_id": sensor_id,
-        "temperature": temperature,
-        "unit": "Celsius",
+        "value": temperature,
+        "unit": "°C",
+        "status": "active",
+        "timestamp": timestamp,
+        "sensor_type": "temperature",
+        "description": "temperature sensor data",
     }
 
-    print(jsonify(response))
+    return jsonify(response)
+
+
+@app.route("/temperature/<sensor_id>")
+def getTemperatureById(sensor_id):
+
+    location = getLocationBySensorId(sensor_id)
+
+    if location == "Unknown":
+        return jsonify({"error": "Sensor ID not found"}), 404
+
+    temperature = generateTemperature()
+    # Форматируем текущее время в RFC3339 (ISO8601)
+    timestamp = datetime.datetime.utcnow().isoformat() + "Z"
+
+    response = {
+        "location": location,
+        "sensor_id": sensor_id,
+        "value": temperature,
+        "unit": "°C",
+        "status": "active",
+        "timestamp": timestamp,
+        "sensor_type": "temperature",
+        "description": "temperature sensor data",
+    }
 
     return jsonify(response)
 

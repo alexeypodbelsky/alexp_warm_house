@@ -1,0 +1,24 @@
+@startuml
+title LightControlService - Component Diagram
+
+skinparam rectangle {
+  BackgroundColor #FFFACD
+  BorderColor black
+  BorderThickness 1
+  RoundCorner 10
+}
+
+rectangle "Light Control Service" as lightService {
+  rectangle "API" as api
+  rectangle "Command Handler" as commandHandler
+  rectangle "Light Module Client" as lightModuleClient
+}
+
+rectangle "Light Control Module" as lightModule #FFE4E1
+
+api --> commandHandler : принимает команды
+commandHandler --> lightModuleClient : отправляет команды
+
+lightModuleClient --> lightModule : управление модулем освещения
+
+@enduml

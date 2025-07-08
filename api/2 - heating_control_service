@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: Heating Control Service API
+  version: 1.0.0
+paths:
+  /commands:
+    post:
+      summary: Отправить команду на отопительное устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeatingCommand'
+      responses:
+        '200':
+          description: Команда принята
+  /status/{deviceId}:
+    get:
+      summary: Получить состояние отопительного устройства
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Текущее состояние устройства
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeatingStatus'
+components:
+  schemas:
+    HeatingCommand:
+      type: object
+      required:
+        - device_id
+        - command
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        command:
+          type: string
+          description: 'turn_on, turn_off, set_temperature'
+        parameters:
+          type: object
+          description: 'Параметры команды'
+    HeatingStatus:
+      type: object
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        is_on:
+          type: boolean
+        current_temperature:
+          type: number
+          format: float
+        target_temperature:
+          type: number
+          format: float
+        updated_at:
+          type: string
+          format: date-time

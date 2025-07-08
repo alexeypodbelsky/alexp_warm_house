@@ -1,0 +1,54 @@
+@startuml
+class TaskInfo {
+    task_name: string
+}
+
+class ConcreteTaskInfo extends TaskInfo {
+    -- Дополнительные поля для конкретной задачи --
+    task_name: string  <<override>>
+}
+
+interface ITaskInvoker {
+    + executeTask(TaskInfo task_info) {abstract}
+}
+
+class TaskInvoker implements ITaskInvoker {
+    - taskHandlerFactory: ITaskHandlerFactory
+    + executeTask(TaskInfo task_info)
+}
+
+interface ICommandProcessor {
+    + executeConcreteCommand() {abstract}
+}
+
+class CommandProcessor implements ICommandProcessor {
+    + executeConcreteCommand()
+}
+
+interface ITaskHandlerFactory {
+    + createHandler(TaskInfo task_info) : ITaskHandlerPrototype {abstract}
+}
+
+class TaskHandlerFactory implements ITaskHandlerFactory {
+    - prototypes: Map<string, ITaskHandlerPrototype>
+    + createHandler(TaskInfo task_info) : ITaskHandlerPrototype
+}
+
+interface ITaskHandlerPrototype {
+    + executeTask(TaskInfo task_info) {abstract}
+    + clone() : ITaskHandlerPrototype {abstract}
+}
+
+class ConcreteTaskHandler implements ITaskHandlerPrototype {
+    + executeTask(TaskInfo task_info)
+    + clone() : ITaskHandlerPrototype
+}
+
+TaskInvoker -- ITaskHandlerFactory : uses >
+CommandProcessor --  ConcreteTaskInfo : uses >
+CommandProcessor -- ITaskInvoker : uses >
+TaskHandlerFactory -- ITaskHandlerPrototype : uses >
+ConcreteTaskHandler -- ConcreteTaskInfo : uses >
+
+@enduml
+

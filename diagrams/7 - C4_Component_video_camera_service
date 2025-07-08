@@ -1,0 +1,37 @@
+@startuml
+title VideoCameraService - Component Diagram
+
+skinparam rectangle {
+  BackgroundColor #D1EEEE
+  BorderColor black
+  BorderThickness 1
+  RoundCorner 10
+}
+
+rectangle "Video & Camera Service" as videoCameraService {
+  rectangle "API" as api
+  rectangle "Video Recorder" as videoRecorder
+  rectangle "Camera Viewer" as cameraViewer
+  rectangle "Motion Detector" as motionDetector
+  rectangle "Video Database Client" as videoDbClient
+  rectangle "Camera Module Client" as cameraModuleClient
+}
+
+rectangle "Video Database" as videoDb #FFE4E1
+rectangle "Camera Module" as cameraModule #FFE4E1
+
+api --> videoRecorder : команды записи
+api --> cameraViewer : запрос видео
+api --> motionDetector : запуск анализа
+
+videoRecorder --> videoDbClient : запись видео
+motionDetector --> videoDbClient : запись метаданных
+
+videoRecorder --> cameraModuleClient : получение видео
+cameraViewer --> cameraModuleClient : просмотр видео
+motionDetector --> cameraModuleClient : анализ видео
+
+videoDbClient --> videoDb : SQL доступ
+cameraModuleClient --> cameraModule : получение видео с камер
+
+@enduml

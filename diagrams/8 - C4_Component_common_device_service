@@ -1,0 +1,23 @@
+@startuml
+title CommonDeviceService - Component Diagram
+
+skinparam rectangle {
+  BackgroundColor #F0E68C
+  BorderColor black
+  BorderThickness 1
+  RoundCorner 10
+}
+
+rectangle "Common Device Service" as commonDeviceService {
+  rectangle "API" as api
+  rectangle "Device Repository" as deviceRegistry
+  rectangle "Device Catalog Client" as deviceCatalogClient
+}
+
+rectangle "Device Catalog Database" as deviceCatalogDb #FFE4E1
+
+api --> deviceRegistry : запросы регистрации/удаления/активации/списка устройств для user_id
+deviceRegistry --> deviceCatalogClient : чтение/запись данных устройств
+deviceCatalogClient --> deviceCatalogDb : SQL доступ
+
+@enduml

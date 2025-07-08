@@ -1,0 +1,26 @@
+@startuml
+title GateMonitoringService - Component Diagram
+
+skinparam rectangle {
+  BackgroundColor #E6E6FA
+  BorderColor black
+  BorderThickness 1
+  RoundCorner 10
+}
+
+rectangle "Gate Monitoring Service" as gateMonitorService {
+  rectangle "API" as api
+  rectangle "State Collector" as stateCollector
+  rectangle "Alert Manager" as alertManager
+  rectangle "Gate Module Client" as gateModuleClient
+}
+
+rectangle "Gate Module" as gateModule #FFE4E1
+
+api --> stateCollector : запрос статусов
+stateCollector --> gateModuleClient : получение данных
+stateCollector --> alertManager : анализ состояния
+
+gateModuleClient --> gateModule : получение данных с модуля ворот
+
+@enduml

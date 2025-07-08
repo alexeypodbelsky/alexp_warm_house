@@ -1,0 +1,24 @@
+@startuml
+title HeatingControlService - Component Diagram
+
+skinparam rectangle {
+  BackgroundColor #FFE4B5
+  BorderColor black
+  BorderThickness 1
+  RoundCorner 10
+}
+
+rectangle "Heating Control Service" as heatingService {
+  rectangle "API" as api
+  rectangle "Command Handler" as commandHandler
+  rectangle "Heating Module Client" as heatingModuleClient
+}
+
+rectangle "Heating Module System" as heatingModuleSystem #FFE4E1
+
+api --> commandHandler : принимает команды
+commandHandler --> heatingModuleClient : отправляет команды
+
+heatingModuleClient --> heatingModuleSystem : управление модулем отопления
+
+@enduml

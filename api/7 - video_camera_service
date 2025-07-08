@@ -1,0 +1,136 @@
+openapi: 3.0.3
+info:
+  title: Video & Camera Service API
+  version: 1.0.0
+paths:
+  /videos/{deviceId}:
+    get:
+      summary: Получить список видеофайлов с камеры
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список видео
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VideoRecord'
+  /videos/file/{videoId}:
+    get:
+      summary: Получить видеофайл по ID
+      parameters:
+        - name: videoId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Видео файл
+          content:
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+  /stream-url/{deviceId}:
+    get:
+      summary: Получить URL для потокового видео с камеры
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          description: Идентификатор устройства камеры
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: URL потокового видео
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stream_url:
+                    type: string
+                    format: uri
+                    example: "rtsp://camera.example.com/stream/12345"
+        '404':
+          description: Камера не найдена 
+  /motion-events:
+    post:
+      summary: Зарегистрировать событие детекции движения
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MotionEvent'
+      responses:
+        '201':
+          description: Событие зарегистрировано
+  /motion-events/{deviceId}:
+    get:
+      summary: Получить события детекции движения по устройству
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список событий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MotionEvent'
+components:
+  schemas:
+    VideoRecord:
+      type: object
+      properties:
+        video_id:
+          type: string
+          format: uuid
+        device_id:
+          type: string
+          format: uuid
+        file_path:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+    MotionEvent:
+      type: object
+      required:
+        - video_id
+        - detected_at
+      properties:
+        event_id:
+          type: string
+          format: uuid
+        video_id:
+          type: string
+          format: uuid
+        detected_at:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+        description:
+          type: string

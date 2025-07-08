@@ -18,7 +18,7 @@ import (
 
 func main() {
 	// Set up database connection
-	dbURL := getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/smarthome")
+	dbURL := getEnv("DATABASE_URL", "postgres://postgres:postgres@127.0.0.1:5432/smarthome")
 	database, err := db.New(dbURL)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)

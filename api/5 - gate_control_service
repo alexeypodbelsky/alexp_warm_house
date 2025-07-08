@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Gate Control Service API
+  version: 1.0.0
+paths:
+  /commands:
+    post:
+      summary: Отправить команду управления воротами
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateCommand'
+      responses:
+        '200':
+          description: Команда принята
+  /status/{deviceId}:
+    get:
+      summary: Получить состояние ворот
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Состояние ворот
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GateStatus'
+components:
+  schemas:
+    GateCommand:
+      type: object
+      required:
+        - device_id
+        - command
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        command:
+          type: string
+          description: 'open, close, stop'
+        parameters:
+          type: object
+          description: 'Параметры команды'
+    GateStatus:
+      type: object
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        is_open:
+          type: boolean
+        is_moving:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
